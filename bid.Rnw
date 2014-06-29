@@ -20,6 +20,15 @@ USMS's bitcoin this past Friday. We model the scenario as a two player
 zero-sum game between me (I would really like to own those coins) 
 and a single other bidder. Both players may choose from the following set of 
 moves $$S =\{\mbox{ABOVE MARKET}, \mbox{AT MARKET}, \mbox{BELOW MARKET}\}.$$
+
+We will assume that if both players submit a bid at market price, a coin
+is flipped to decide the winner. The situation becomes complicated when the 
+players submit matching bids of either both above or both below market price.
+One could even imagine a matrix game within a matrix
+game where once we know both bids are in the same range the players enter a new
+game where the moves become $5\%, 10\%$, or $15\%$ above/below market price.
+For simplicity's sake, if both players submit matching bids, a coin
+is flipped to decide the winner.
 The matrix game is then 
 \begin{align*}
 G = \bordermatrix{
@@ -69,7 +78,7 @@ to an equivalent one that a linear solver can handle
 Since there are no constraints on $x_4$, maximizing it ``pushes" its value
 up until $x_4$ is exactly equal to 
 $\min\{0.5x_1,~x_1 +0.5x_2,~x_1 + x_2+0.5x_3\}$. Hence we have achieved our goal
-of maximizing our minumum payoff.
+of maximizing our minimum payoff.
 The following R code solves the LP for us
 <<Test, echo=TRUE, results=verbatim>>=
 library(lpSolve)
