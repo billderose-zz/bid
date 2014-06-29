@@ -27,14 +27,13 @@ game where the moves become $5\%, 10\%$, or $15\%$ above/below market price.
 
 
 For simplicity's sake, if both players submit matching bids, a coin
-is flipped to decide the winner. We will see later exactly why
-such simplifications do not hinder our ability to analyze the situation.
+is flipped to decide the winner.
 The matrix game is then 
 \begin{align*}
 G = \bordermatrix{
       &   AM & @M & BM\cr
       AM & 0.5 & 1 & 1\cr
-    	@M & 0 & 0.5 & 1\cr
+    	@M & 0 & 0.5 & 1.5\cr
 			BM & 0 & 0 & 0.5\cr}
 \end{align*}
 where the payoffs are to me, ``player one". In this case my moves correspond to 
@@ -57,7 +56,7 @@ is the probability that I bid $at$ the market price, and $x_3$ is the
 probability that I bid $below$ the market price. To find our optimal 
 strategy, we must solve the following LP
 \begin{align*}
-\text{Maximize~~~~}&\min\{0.5x_1,~x_1 +0.5x_2,~x_1 + x_2+0.5x_3\}\\
+\text{Maximize~~~~}&\min\{0.5x_1,~x_1 +0.5x_2,~x_1 + 1.5x_2+0.5x_3\}\\
 \text{Subject to~~~~}&x_1 + x_2 + x_3 = 1\\
 &x_1, x_2, x_3 \ge 0
 \end{align*}
@@ -71,13 +70,13 @@ to an equivalent one that a linear solver can handle
 \text{Maximize~~~~}&x_4\\
 \text{Subject to~~~~}&0.5x_1 \ge x_4 \\
 &x_1 +0.5x_2 \ge x_4\\
-&x_1 + x_2+0.5x_3 \ge x_4\\
+&x_1 + 1.5x_2+0.5x_3 \ge x_4\\
 &x_1 + x_2 + x_3 = 1\\
 &x_1, x_2, x_3 \ge 0
 \end{align*}
 Since there are no real constraints on $x_4$, maximizing it ``pushes" its value
 up until $x_4$ is exactly equal to 
-$\min\{0.5x_1,~x_1 +0.5x_2,~x_1 + x_2+0.5x_3\}$. Hence we have achieved our goal
+$\min\{0.5x_1,~x_1 +0.5x_2,~x_1 + 1.5x_2+0.5x_3\}$. Hence we have achieved our goal
 of maximizing our minimum payoff.
 
 The following R code solves the LP for us
@@ -87,7 +86,7 @@ The following R code solves the LP for us
 > obj <- c(0, 0, 0, 1)
 > con <- matrix(c(0.5, 0, 0, -1,
 +                 1, 0.5, 0, -1,
-+                 1, 1, 0.5, -1,
++                 1, 1.5, 0.5, -1,
 +                 1, 1, 1, 0), byrow = T, nrow = 4)
 > rhs <- c(0, 0, 0, 1)
 > dir <- c(">=", ">=", ">=", "=")
@@ -111,26 +110,38 @@ above the market price.
 An even easier way to arrive at this solution is by using 
 \href{http://en.wikipedia.org/wiki/Strategic_dominance}{\uline{dominance}}
 to eliminate possible moves. We can throw out
-moves two and three because I am guaranteed to always do at least as good or
+move three because I am guaranteed to always do at least as good or
 better if I play move one than if I were to play 
-move two or three. Hence, the game I see may be simplified to
+move three. Hence, the game I see may be simplified to
 \begin{align*}
 G' = \bordermatrix{
       &   AM & @M & BM\cr
-      AM & 0.5 & 1 & 1}
+      AM & 0.5 & 1 & 1 \cr
+      @M & 0 & 1 & 1.5}
 \end{align*}
-and again my maximin strategy is $x = \begin{bmatrix}1 & 0 & 0 \end{bmatrix}^t$.
-
-In fact, we can use dominance to justify the simplifications we made to the bidding proceedings. Move one always dominates move
-three, no matter how we decide to handle matching bids. Likewise,
-there is always some uncertainty about who wins if
-both players bid ``at" market price. Thus, the $(2, 2)$ entry in
-$G$ can never quite be 1 and even if my payoff is 0 when both players bid above the market price move one still dominates move two.
-
+However, from player two's standpoint move one dominates moves two and three,
+so the payoff matrix becomes
+\begin{align*}
+G'' = \bordermatrix{
+      &   AM \cr
+      AM & 0.5 \cr
+      @M & 0}
+\end{align*}
+And now move one for player one dominates move two, so we are left with
+\begin{align*}
+G'' = \bordermatrix{
+      &   AM \cr
+      AM & 0.5}
+\end{align*}
+Thus the optimal strategy for both players is 
+$x = \begin{bmatrix}1 & 0 & 0 \end{bmatrix}^t$. Granted, this simple model
+assumes that winning the auction, not winning the most coins at the lowest
+cost, is the optimal approach. Still, it is a nice exercise in linear
+programming and exposes the reader to a few concepts from game theory.
 
 
 The reader is encouraged to solve the LP a third way: graphically. Start by plotting 
-$0.5x_1,~x_1 + 0.5x_2$, and $x_1 + x_2 + 0.5x_3$ against one another
+$0.5x_1,~x_1 + 0.5x_2$, and $x_1 + 1.5x_2 + 0.5x_3$ against one another
 and go from there.
 
 
