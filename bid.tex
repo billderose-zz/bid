@@ -1,17 +1,13 @@
-\documentclass[11pt, oneside]{article}     % use "amsart" instead of "article" for AMSLaTeX format
-\usepackage{geometry}                		% See geometry.pdf to learn the layout options. There are lots.
-\geometry{letterpaper}                   		% ... or a4paper or a5paper or ... 
-%\geometry{landscape}                		% Activate for for rotated page geometry
-%\usepackage[parfill]{parskip}    		% Activate to begin paragraphs with an empty line rather than an indent
+\documentclass[11pt, oneside]{article}     
+\usepackage{geometry}
+\geometry{letterpaper}
 \usepackage{ulem}
-\usepackage{graphicx}				% Use pdf, png, jpg, or epsß with pdflatex; use eps in DVI mode
+\usepackage{graphicx}
 \usepackage{amsmath}
-								% TeX will automatically convert eps --> pdf in pdflatex		
 \usepackage{amssymb}
 \usepackage[colorlinks=true,urlcolor=blue]{hyperref}
 \title{The Bitcoiner's Dilemma}
 \author{Bill DeRose}
-%\date{}							% Activate to display a given date or no date
 \usepackage{Sweave}
 \begin{document}
 \input{bid-concordance}
@@ -20,7 +16,7 @@ I'd like to present a simplified analysis of the bidding that took place for the
 USMS's bitcoin this past Friday. We model the scenario as a two player
 zero-sum game between me (I would really like to own those coins) 
 and a single other bidder. Both players may choose from the following set of 
-moves $$S =\{\mbox{ABOVE MARKET}, \mbox{AT MARKET}, \mbox{BELOW MARKET}\}.$$
+moves $$S =\{\mbox{ABOVE MARKET},~\mbox{AT MARKET},~\mbox{BELOW MARKET}\}.$$
 
 We will assume that if both players submit a bid at market price, a coin
 is flipped to decide the winner. The situation becomes complicated when the 
@@ -45,7 +41,7 @@ where the payoffs are to me, ``player one". In this case my moves correspond to
 selecting rows so 
 my maximin strategy is $x = \begin{bmatrix}1 & 0 & 0 \end{bmatrix}^t$. 
 There are a few ways to arrive at this answer and we will begin with
-the simplest before diving a little further into the math behind it.
+the simplest before looking briefly at the math behind it.
 
 
 If we don't want to dirty our hands with the computation once we've set
@@ -79,7 +75,7 @@ to an equivalent one that a linear solver can handle
 &x_1 + x_2 + x_3 = 1\\
 &x_1, x_2, x_3 \ge 0
 \end{align*}
-Since there are no constraints on $x_4$, maximizing it ``pushes" its value
+Since there are no real constraints on $x_4$, maximizing it ``pushes" its value
 up until $x_4$ is exactly equal to 
 $\min\{0.5x_1,~x_1 +0.5x_2,~x_1 + x_2+0.5x_3\}$. Hence we have achieved our goal
 of maximizing our minimum payoff.
@@ -115,8 +111,8 @@ above the market price.
 An even easier way to arrive at this solution is by using 
 \href{http://en.wikipedia.org/wiki/Strategic_dominance}{\uline{dominance}}
 to eliminate possible moves. We can throw out
-moves two and three because I am guaranteed to always do better (i.e. my payoff
-is always at least as good or better) if I play move one than if I were to play 
+moves two and three because I am guaranteed to always do at least as good or
+better if I play move one than if I were to play 
 move two or three. Hence, the game I see may be simplified to
 \begin{align*}
 G' = \bordermatrix{
