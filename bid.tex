@@ -1,0 +1,121 @@
+\documentclass[11pt, oneside]{article}     % use "amsart" instead of "article" for AMSLaTeX format
+\usepackage{geometry}                		% See geometry.pdf to learn the layout options. There are lots.
+\geometry{letterpaper}                   		% ... or a4paper or a5paper or ... 
+%\geometry{landscape}                		% Activate for for rotated page geometry
+%\usepackage[parfill]{parskip}    		% Activate to begin paragraphs with an empty line rather than an indent
+\usepackage{ulem}
+\usepackage{graphicx}				% Use pdf, png, jpg, or epsß with pdflatex; use eps in DVI mode
+\usepackage{amsmath}
+								% TeX will automatically convert eps --> pdf in pdflatex		
+\usepackage{amssymb}
+\usepackage[colorlinks=true,urlcolor=blue]{hyperref}
+\title{The Bitcoiner's Dilemma}
+\author{Bill DeRose}
+%\date{}							% Activate to display a given date or no date
+\usepackage{Sweave}
+\begin{document}
+\input{bid-concordance}
+\maketitle
+I'd like to present a simplified analysis of the bidding that took place for the 
+USMS' bitcoin this past Friday. We model the scenario as a two player 
+zero-sum game between me (I would really like to own those coins) 
+and a single other bidder. Both players may choose from the following set of 
+moves $$S =\{\mbox{ABOVE MARKET}, \mbox{AT MARKET}, \mbox{BELOW MARKET}\}.$$
+The matrix game is then 
+\begin{align*}
+G = \bordermatrix{
+      &   AM & @M & BM\cr
+      AM & 0.5 & 1 & 1\cr
+    	@M & 0 & 0.5 & 1\cr
+			BM & 0 & 0 & 0.5\cr}
+\end{align*}
+where the payoffs are to me, ``player one". In this case my moves correspond to 
+selecting rows so 
+my maximin strategy is $x = \begin{bmatrix}1 & 0 & 0 \end{bmatrix}^t$. 
+There are a few ways to arrive at this answer and we will begin with
+the simplest before diving a little further into the math behind it.
+
+
+If we don't want to dirty our hands with the computation once we've set
+up our game we can use a solver readily available from
+\href{http://www.math.ucla.edu/~tom/gamesolve.html}{\uline{UCLA}}. Just plug in the
+matrix and let it spit out the answer.
+
+However, if we are so inclined, we can find the optimal strategy ourselves
+by solving a linear program. Let $x' = \begin{bmatrix}x_1 & x_2 & x_3\end{bmatrix}^t$ 
+be the probability vector that describes my bidding strategy. 
+That is, $x_1$ is  the probability that I bid $above$ the market price, $x_2$ 
+is the probability that I bid $at$ the market price, and $x_3$ is the 
+probability that I bid $below$ the market price. To find our optimal 
+strategy, we must solve the following LP
+\begin{align*}
+\text{Maximize~~~~}&\min\{0.5x_1,~x_1 +0.5x_2,~x_1 + x_2+0.5x_3\}\\
+\text{Subject to~~~~}&x_1 + x_2 + x_3 = 1\\
+&x_1, x_2, x_3 \ge 0
+\end{align*}
+We wish to maximize our minimum payoff, which depends on the move
+our opponent (``player two") selects. The functions whose minimum we wish
+to maximize correspond to 
+player two's decision to bid above, at, or below market price, respectively.
+However, the $\min$ function is not linear so we must transform the LP 
+to an equivalent one that a linear solver can handle
+\begin{align*}
+\text{Maximize~~~~}&x_4\\
+\text{Subject to~~~~}&0.5x_1 \ge x_4 \\
+&x_1 +0.5x_2 \ge x_4\\
+&x_1 + x_2+0.5x_3 \ge x_4\\
+&x_1 + x_2 + x_3 = 1\\
+&x_1, x_2, x_3 \ge 0
+\end{align*}
+Since there are no constraints on $x_4$, maximizing it ``pushes" its value
+up until $x_4$ is exactly equal to 
+$\min\{0.5x_1,~x_1 +0.5x_2,~x_1 + x_2+0.5x_3\}$. Hence we have achieved our goal
+of maximizing our minumum payoff.
+The following R code solves the LP for us
+\begin{Schunk}
+\begin{Sinput}
+> library(lpSolve)
+> obj <- c(0, 0, 0, 1)
+> con <- matrix(c(0.5, 0, 0, -1,
++                 1, 0.5, 0, -1,
++                 1, 1, 0.5, -1,
++                 1, 1, 1, 0), byrow = T, nrow = 4)
+> rhs <- c(0, 0, 0, 1)
+> dir <- c(">=", ">=", ">=", "=")
+> lp("max",obj, con, dir, rhs)
+\end{Sinput}
+\begin{Soutput}
+Success: the objective function is 0.5 
+\end{Soutput}
+\begin{Sinput}
+> lp("max",obj, con, dir, rhs)$solution
+\end{Sinput}
+\begin{Soutput}
+[1] 1.0 0.0 0.0 0.5
+\end{Soutput}
+\end{Schunk}
+Thus the optimal values are $x_1 = 1, x_2 = 0, x_3 = 0, 
+x_4 = 0.5$ and our optimal strategy is to always (with probability 1) bid 
+above the market price.
+
+
+An even easier way to arrive at this solution is by using 
+\href{http://en.wikipedia.org/wiki/Strategic_dominance}{\uline{dominance}}
+to eliminate possible moves. We can throw out
+moves two and three because I am guaranteed to always do better (i.e. my payoff
+is always greater) if I play move one than if I were to play 
+move two or three. Hence, the game I see may be simplified to
+\begin{align*}
+G' = \bordermatrix{
+      &   AM & @M & BM\cr
+      AM & 0.5 & 1 & 1}
+\end{align*}
+and again my maximin strategy is $x = \begin{bmatrix}1 & 0 & 0 \end{bmatrix}^t$.
+
+
+The reader is encouraged to solve the LP a third way: graphically. Start by plotting 
+$0.5x_1,~x_1 + 0.5x_2$, and $x_1 + x_2 + 0.5x_3$ against one another
+and go from there.
+
+
+\end{document}  

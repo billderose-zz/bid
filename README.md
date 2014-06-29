@@ -1,0 +1,1 @@
+A simple game-theoretic approach to bidding for bitcoin.
