@@ -27,8 +27,11 @@ players submit matching bids of either both above or both below market price.
 One could even imagine a matrix game within a matrix
 game where once we know both bids are in the same range the players enter a new
 game where the moves become $5\%, 10\%$, or $15\%$ above/below market price.
+
+
 For simplicity's sake, if both players submit matching bids, a coin
-is flipped to decide the winner.
+is flipped to decide the winner. We will see later exactly why
+such simplifications do not hinder our ability to analyze the situation.
 The matrix game is then 
 \begin{align*}
 G = \bordermatrix{
@@ -79,6 +82,7 @@ Since there are no constraints on $x_4$, maximizing it ``pushes" its value
 up until $x_4$ is exactly equal to 
 $\min\{0.5x_1,~x_1 +0.5x_2,~x_1 + x_2+0.5x_3\}$. Hence we have achieved our goal
 of maximizing our minimum payoff.
+
 The following R code solves the LP for us
 <<Test, echo=TRUE, results=verbatim>>=
 library(lpSolve)
@@ -101,7 +105,7 @@ An even easier way to arrive at this solution is by using
 \href{http://en.wikipedia.org/wiki/Strategic_dominance}{\uline{dominance}}
 to eliminate possible moves. We can throw out
 moves two and three because I am guaranteed to always do better (i.e. my payoff
-is always greater) if I play move one than if I were to play 
+is always at least as good or better) if I play move one than if I were to play 
 move two or three. Hence, the game I see may be simplified to
 \begin{align*}
 G' = \bordermatrix{
@@ -109,6 +113,13 @@ G' = \bordermatrix{
       AM & 0.5 & 1 & 1}
 \end{align*}
 and again my maximin strategy is $x = \begin{bmatrix}1 & 0 & 0 \end{bmatrix}^t$.
+
+In fact, we can use dominance to justify the simplifications we made to the bidding proceedings. Move one always dominates move
+three, no matter how we decide to handle matching bids. Likewise,
+there is always some uncertainty about who wins if
+both players bid ``at" market price. Thus, the $(2, 2)$ entry in
+$G$ can never quite be 1 and even if my payoff is 0 when both players bid above the market price move one still dominates move two.
+
 
 
 The reader is encouraged to solve the LP a third way: graphically. Start by plotting 
